@@ -1,6 +1,7 @@
 import os
 import pickle
 from pprint import pformat
+from typing import Any
 
 import pytest
 from _pytest.fixtures import pytest_fixture_setup as fixture_result
@@ -21,7 +22,7 @@ class Plugin:
     Pytest persistence plugin
     """
 
-    output = {
+    output: dict[str, Any] = {
         "session": {},
         "package": {},
         "module": {},
@@ -30,9 +31,9 @@ class Plugin:
         "workers": {},
         "tests": {},
     }
-    input = {}
-    unable_to_pickle = set()
-    pickled_fixtures = set()
+    input: dict[str, Any] = {}
+    unable_to_pickle: set[tuple[str, str, str]] = set()
+    pickled_fixtures: set[tuple[str, str, str]] = set()
 
     def pytest_sessionstart(self, session):
         """
