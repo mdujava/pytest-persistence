@@ -88,6 +88,9 @@ class Plugin:
         Called after whole test run finished, right before returning the exit status to the system.
         Checks whether '--store' option is present. If it is, store fixtures results to given file.
         """
+        if session.config.getoption("collectonly"):
+            # early return if we are run with --collect-only
+            return
         if file := session.config.getoption("--store"):
             if worker := os.getenv("PYTEST_XDIST_WORKER"):
                 self.output_to_file(f"{file}_{worker}")
