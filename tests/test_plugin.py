@@ -83,3 +83,16 @@ def test_bug(request):
     assert "tests/mock/test_B.py . " in stream
     assert "2 passed" in stream
 
+
+def test_collect_only(request):
+    os.system("pytest --collect-only --store stored_tests tests/mock/")
+
+    stream = os.popen('ls').read()
+    assert "stored_tests" not in stream.split('\n')
+
+    pytest_stream = os.popen("pytest --collect-only -n2 --store stored_tests tests/mock/").read()
+    assert "2 tests collected" in pytest_stream
+
+    stream = os.popen('ls').read()
+    assert "stored_tests" not in stream.split('\n')
+
