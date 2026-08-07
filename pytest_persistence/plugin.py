@@ -1,6 +1,7 @@
 import os
 import pickle
 from pprint import pformat
+from typing import Any
 
 import pytest
 from _pytest.fixtures import pytest_fixture_setup as fixture_result
@@ -12,20 +13,27 @@ def pytest_addoption(parser):
     """
     Add option to store/load fixture results into file
     """
-    parser.addoption(
-        "--store", action="store", default=False, help="Store config")
-    parser.addoption(
-        "--load", action="store", default=False, help="Load config")
+    parser.addoption("--store", action="store", default=False, help="Store config")
+    parser.addoption("--load", action="store", default=False, help="Load config")
 
 
 class Plugin:
     """
     Pytest persistence plugin
     """
-    output = {"session": {}, "package": {}, "module": {}, "class": {}, "function": {}, "workers": {}, "tests": {}}
-    input = {}
-    unable_to_pickle = set()
-    pickled_fixtures = set()
+
+    output: dict[str, Any] = {
+        "session": {},
+        "package": {},
+        "module": {},
+        "class": {},
+        "function": {},
+        "workers": {},
+        "tests": {},
+    }
+    input: dict[str, Any] = {}
+    unable_to_pickle: set[tuple[str, str, str]] = set()
+    pickled_fixtures: set[tuple[str, str, str]] = set()
 
     def pytest_sessionstart(self, session):
         """
@@ -37,7 +45,7 @@ class Plugin:
             if os.path.isfile(file):
                 raise FileExistsError("This file already exists")
         if file := session.config.getoption("--load"):
-            with open(file, 'rb') as f:
+            with open(file, "rb") as f:
                 self.input = pickle.load(f)
 
     def check_output(self):
@@ -67,7 +75,7 @@ class Plugin:
 
     def output_to_file(self, filename):
         """Serialize output dict into file"""
-        with open(filename, 'wb') as outfile:
+        with open(filename, "wb") as outfile:
             self.check_output()
             pickle.dump(self.output, outfile)
 
@@ -90,7 +98,7 @@ class Plugin:
                 workers = None
             if workers:
                 for i in range(workers):
-                    with open(f"{file}_gw{i}", 'rb') as f:
+                    with open(f"{file}_gw{i}", "rb") as f:
                         self.merge_dicts(pickle.load(f))
                         os.remove(f"{file}_gw{i}")
             self.output_to_file(file)

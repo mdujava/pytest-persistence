@@ -30,7 +30,7 @@ class XDistScheduling(LoadScheduling):
         if self.maxschedchunk is None:
             self.maxschedchunk = len(self.collection)
 
-        for (test, gw) in self.test_order.items():
+        for test, gw in self.test_order.items():
             node = [x for x in self.nodes if x.gateway.id == gw][0]
             test_id = self.collection.index(test)
             self.node2pending[node].append(test_id)
