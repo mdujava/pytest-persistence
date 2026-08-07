@@ -32,8 +32,9 @@ class XDistScheduling(LoadScheduling):
 
         for test, gw in self.test_order.items():
             node = [x for x in self.nodes if x.gateway.id == gw][0]
-            test_id = self.collection.index(test)
-            self.node2pending[node].append(test_id)
+            if test in self.collection:
+                test_id = self.collection.index(test)
+                self.node2pending[node].append(test_id)
         for node in self.nodes:
             node.send_runtest_some(self.node2pending[node])
         self.pending = []
